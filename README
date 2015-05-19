@@ -1,4 +1,7 @@
 Fork of OpenSlot.de with the main goal to adapt the firmware to use the blackbox for an analog Carrera track.
+The code is hosted at https://github.com/S-I-M-O-N/openslot.de
+The original OpenSlot.de code and hardware mod can be found at http://www.openslot.de
+
   Feature whishlist
     1. start lights
     2. analog lapcounter
