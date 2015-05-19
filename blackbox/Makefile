@@ -20,7 +20,11 @@ endif
 
 PROGRAMMER=-P $(PORT) -c stk500v2
 ifdef IF
-PROGRAMMER=-c $(IF)
+ ifdef USB
+ PROGRAMMER=-P $(PORT) -c $(IF)
+ else
+ PROGRAMMER=-c $(IF)
+ endif
 endif
 
 #SRC = main.c seriald.c driver/ADC.c driver/clock.c driver/timer.c
@@ -93,7 +97,7 @@ restore:
 	$(AVRDUDE) $(PROGRAMMER) -b $(ISP_BAUD) -i 1 -p $(MCU) -V -U flash:w:$(PRG).hex:i
 
 fuse:
-	$(AVRDUDE) -c $(PROGRAMMER) -p $(MCU) -V $(FUSES)
+	$(AVRDUDE) $(PROGRAMMER) -p $(MCU) -V $(FUSES)
 
 clean:
 	rm -rf *.o *.elf *.elf.src *.s *.i
