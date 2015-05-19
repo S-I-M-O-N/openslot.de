@@ -1,0 +1,13 @@
+Original firmware:
+- acts as a simple single switch
+- Adds 150µS low phase to each controller / ghostcar packet
+
+New Firmware:
+- acts as single switch
+- acts as car time sensor on both lanes
+- send "car entered / leaved pitlane" through ResponseWire to CU
+
+Future plan:
+Configurable via serial interface on CU:
+    - Adds 150µS low phase to each controller / ghostcar packet
+      so "normal" refueling works

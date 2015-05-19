@@ -1,0 +1,9 @@
+[Settings]
+Name=unnamed
+Fuel=100
+Accel=10
+Limit=10
+Brake=15
+
+[Stats]
+Disabled=1

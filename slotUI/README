@@ -1,0 +1,10 @@
+openslot gui
+
+aptitude install python python-serial
+
+und noch irgend eine dependency die mir gerade nicht einfällt, die python
+aber beim starten dann anmeckern wird
+
+Die Soundfiles gehören in den Ordner quake-sound.
+Aus Lizenzrechtlichen Gründen sind diese nicht enthalten. Siehe readme im ordner
+sound.

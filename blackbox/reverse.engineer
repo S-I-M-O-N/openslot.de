@@ -1,0 +1,15 @@
+avrdude: safemode: lfuse reads as 2F
+avrdude: safemode: hfuse reads as C8
+
+Paketintervall = 7.5 ms
+
+1 Startbit
+MSB vs LSB-Format???
+8 MHz Systemtakt
+
+
+Datentakt (bits) Bus = 50 µs == 20 KHz
+TIMER0 (8bit mit prescaler 2): alle 400/200 Taktzyklen Manchester Code ausgeben
+
+TIMER1 (16bit) Pakettimer = 7,5 ms == 133 Hz: alle 60000 Taktzyklen ein Paket ausgeben
+

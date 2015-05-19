@@ -1,0 +1,22 @@
+The sounds are just examples, you can exchange them with whatever you want
+
+The sound files are public domain, downloaded from:
+http://www.mediacollege.com/downloads/permission/public-domain.html
+
+full list of sound triggers:
+
+        "countdown_start": os.path.abspath(SOUNDPREFIX + "sound/countdown.mp3"),
+        "race_start":      os.path.abspath(SOUNDPREFIX + "sound/racestart.mp3"),
+        "race_prepare":    os.path.abspath(SOUNDPREFIX + "sound/prepare.mp3"),
+        "lap_record":      os.path.abspath(SOUNDPREFIX + "sound/laprecord.mp3"),
+#        "first_position":  os.path.abspath(SOUNDPREFIX + "sound/laprecord.mp3"),
+        "fuel_warning1":   os.path.abspath(SOUNDPREFIX + "sound/fuel1.mp3"),
+        "fuel_warning2":   os.path.abspath(SOUNDPREFIX + "sound/fuel2.mp3"),
+        "fuel_full":       os.path.abspath(SOUNDPREFIX + "sound/fuel_full.mp3"),
+        "pitlane_enter":   os.path.abspath(SOUNDPREFIX + "sound/pitlane_enter.mp3"),
+        "pitlane_exit":    os.path.abspath(SOUNDPREFIX + "sound/pitlane_exit.mp3"),
+        "data_error":      os.path.abspath(SOUNDPREFIX + "sound/data_error.mp3"),
+        "panic":           os.path.abspath(SOUNDPREFIX + "sound/panic.mp3"),
+        "panic_shortcut":  os.path.abspath(SOUNDPREFIX + "sound/panic_shortcut.mp3"),
+        "resume":          os.path.abspath(SOUNDPREFIX + "sound/resume.mp3"),
+        "win":             os.path.abspath(SOUNDPREFIX + "sound/win.mp3"),
