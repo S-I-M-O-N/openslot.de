@@ -1,3 +1,26 @@
+Fork of OpenSlot.de with the main goal to adapt the firmware to use the blackbox for an analog Carrera track.
+  Feature whishlist
+    1. start lights
+    2. analog lapcounter
+    3. PWM based speed limit
+    
+    optional possible features
+    4. live display of track voltages
+    5. ghostcar function
+    6. ...
+
+Issues/Findings/ToDo
+
+openslot-1.8 only works with a 18V power supply. On 14,8V it immediatly triggers the short circuit detection.
+There seems to be a redundant input signal for the rail status which is not used by the openslot.de firmware.
+Maybe Carrera had some sort of Voltage detection and different I/O for 14,8V and 18V.
+
+
+
+Thanks a lot to the great folks at www.openslot.de who gave us this awesome firmware to play around with.
+
+-Original README-
+
 OpenSlot.de
 Custom Firmware and hardware mod
 
