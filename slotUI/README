@@ -1,6 +1,6 @@
 openslot gui
 
-aptitude install python python-serial
+aptitude install python python-serial mpg123
 
 und noch irgend eine dependency die mir gerade nicht einfällt, die python
 aber beim starten dann anmeckern wird
