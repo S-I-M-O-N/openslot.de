@@ -20,7 +20,7 @@ import threading
 
 
 VERSION = "1.8"
-MAXSLOTS = 6
+MAXSLOTS = 2
 TERM = {
     "caption": "\033[1;37m\033[1;44m",
     "text": "\033[1;30m",
@@ -417,7 +417,7 @@ class SlotCli():
         curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLUE) # label
         curses.init_pair(9, curses.COLOR_WHITE, curses.COLOR_RED) # ATTENTION
         curses.init_pair(11, curses.COLOR_BLACK, curses.COLOR_YELLOW) # player 1 slot
-        curses.init_pair(12, curses.COLOR_BLACK, curses.COLOR_GREEN) # player 2 slot
+        curses.init_pair(12, curses.COLOR_WHITE, curses.COLOR_BLACK) # player 2 slot
         curses.init_pair(13, curses.COLOR_BLACK, curses.COLOR_RED) # player 3 slot
         curses.init_pair(14, curses.COLOR_BLACK, curses.COLOR_MAGENTA) # player 4 slot
         curses.init_pair(15, curses.COLOR_WHITE, curses.COLOR_BLACK) # player 5 slot
@@ -552,6 +552,7 @@ class SlotCli():
                         t = int(data[1], 16) / 2000.00
                         self.slot[slot]["jumpstart"] = t
                         self.slot[slot]["status"] = "Jumpstart!"
+			self.render_slots()
 
                     if rx[:3] == "RW:":
                         # ResponseWire packet, do nothing at the moment, just decode

@@ -47,10 +47,10 @@ void LED(uint8_t num, uint8_t state) {
 
 void LEDS_OFF(void) {
     LED1_PORT &= ~_BV(LED1);
-    LED2_PORT &= ~_BV(LED1);
-    LED3_PORT &= ~_BV(LED1);
-    LED4_PORT &= ~_BV(LED1);
-    LED5_PORT &= ~_BV(LED1);
+    LED2_PORT &= ~_BV(LED2);
+    LED3_PORT &= ~_BV(LED3);
+    LED4_PORT &= ~_BV(LED4);
+    LED5_PORT &= ~_BV(LED5);
 }
 
 void init_hardware(void) {
@@ -73,19 +73,21 @@ void init_hardware(void) {
     DDR(LED5_PORT) |= _BV(LED5);
 
     // set Controller Input Pull-UPs
-    CONTROLLER_PORT |= (_BV(CONTROLLER1_SW) | _BV(CONTROLLER2_SW) | _BV(CONTROLLER3_SW) | _BV(CONTROLLER4_SW));
+//    CONTROLLER_PORT |= (_BV(CONTROLLER1_SW) | _BV(CONTROLLER2_SW) | _BV(CONTROLLER3_SW) | _BV(CONTROLLER4_SW));
 
     // switch pull-ups
     SW_FUEL_PORT |= _BV(SW_FUEL);
     SW_START_PORT |= _BV(SW_START);
     //SW_PACECAR_PORT |= _BV(SW_PACECAR);
+    SLOT1_PORT &= ~_BV(SLOT1);
+    SLOT2_PORT &= ~_BV(SLOT2);
 
     // control outputs
-    DDR(LAP_COUNTER_PORT) |= _BV(LAP_COUNTER);
+//    DDR(LAP_COUNTER_PORT) |= _BV(LAP_COUNTER);
 
     // setup rail control
     //RAIL_DETECT_PORT |= _BV(RAIL_DETECT); // enable internal pull-up
-    DDR(RAIL_POWER_PORT) |= _BV(RAIL_POWER);
+//    DDR(RAIL_POWER_PORT) |= _BV(RAIL_POWER);
 
     // setup debut output on i2c pins
     DDR(PORTC) |= _BV(PC0) | _BV(PC1);
@@ -104,14 +106,14 @@ void init_hardware(void) {
 
 
     // setup response receiver timer
-    TCCR0 = (1<<CS01); //divide by 8
+//    TCCR0 = (1<<CS01); //divide by 8
     // interrupt enable + tcnt0 set in timer2
 
 
     // setup data bit + carid timer
-    TCCR2 = (1<<CS21) | (1<<WGM21); //divide by 8, set compare match
-    OCR2 = TIMER2_50US;
-    TIMSK |= _BV(OCIE2); //enable timer2 interrupt
+//    TCCR2 = (1<<CS21) | (1<<WGM21); //divide by 8, set compare match
+//    OCR2 = TIMER2_50US;
+//    TIMSK |= _BV(OCIE2); //enable timer2 interrupt
 
     // enable carid interrupts
     MCUCR = _BV(ISC00) | _BV(ISC01) | _BV(ISC10) | _BV(ISC11); // INT0/1 rising edge
@@ -132,7 +134,7 @@ void init_hardware(void) {
 }
 
 void panic_mode(void) {
-    RAIL_POWER_PORT &= ~_BV(RAIL_POWER); // disable rails power
+//    RAIL_POWER_PORT &= ~_BV(RAIL_POWER); // disable rails power
     LEDS_OFF();
     LED(1, 2);
     blinkdelay();
@@ -150,56 +152,56 @@ void panic_mode(void) {
 }
 
 
-uint8_t check_rails_shortcut(void) {
-    // check for short circuit on the rails
-    uint8_t i = 100;
-    if ((PIN(RAIL_DETECT_PORT) & _BV(RAIL_DETECT)) == 0) {
-        while (i>0) {
-            if ((PIN(RAIL_DETECT_PORT) & _BV(RAIL_DETECT)) != 0) return 0;
-            _delay_us(20);
-            i--;
-        }
-        if ((PIN(RAIL_DETECT_PORT) & _BV(RAIL_DETECT)) == 0) {
-            // set panic mode
-            mode = 0xff;
-            RAIL_POWER_PORT &= ~_BV(RAIL_POWER); // disable rails power
-            // wait a little to all interrupts complete
-            //cli(); // disable ALL Interrupts
-            _delay_ms(2);
-            RAIL_POWER_PORT &= ~_BV(RAIL_POWER); // disable rails power
-            RS232_puts_p(SHORTCUT);
-            LED(1, 1);
-            LED(2, 1);
-            LED(3, 0);
-            LED(4, 0);
-            LED(5, 0);
-            while (mode == 0xff) {
-                LED(1, 2);
-                LED(2, 2);
-                LED(4, 2);
-                LED(5, 2);
-                blinkdelay();
-                LED(3, 2);
-                blinkdelay();
-                LED(3, 2);
-                blinkdelay();
-                LED(3, 2);
-                blinkdelay();
-                LED(3, 2);
-                btn_start = (PIN(SW_START_PORT) & _BV(SW_START));
-                if (old_start != btn_start) {
-                    // start button changed
-                    if (btn_start == 0) {
-                        mode = 0;
-                        RS232_puts_p(RESUME);
-                    }
-                    old_start = btn_start;
-                }
-
-            }
-            LEDS_OFF();
-            LED(3, 1);
-        }
-    }
-    return 0;
-}
+//uint8_t check_rails_shortcut(void) {
+//    // check for short circuit on the rails
+//    uint8_t i = 100;
+//    if ((PIN(RAIL_DETECT_PORT) & _BV(RAIL_DETECT)) == 0) {
+//        while (i>0) {
+//            if ((PIN(RAIL_DETECT_PORT) & _BV(RAIL_DETECT)) != 0) return 0;
+//            _delay_us(20);
+//            i--;
+//        }
+//        if ((PIN(RAIL_DETECT_PORT) & _BV(RAIL_DETECT)) == 0) {
+//            // set panic mode
+//            mode = 0xff;
+//            RAIL_POWER_PORT &= ~_BV(RAIL_POWER); // disable rails power
+//            // wait a little to all interrupts complete
+//            //cli(); // disable ALL Interrupts
+//            _delay_ms(2);
+//            RAIL_POWER_PORT &= ~_BV(RAIL_POWER); // disable rails power
+//            RS232_puts_p(SHORTCUT);
+//            LED(1, 1);
+//            LED(2, 1);
+//            LED(3, 0);
+//            LED(4, 0);
+//            LED(5, 0);
+//            while (mode == 0xff) {
+//                LED(1, 2);
+//                LED(2, 2);
+//                LED(4, 2);
+//                LED(5, 2);
+//                blinkdelay();
+//                LED(3, 2);
+//                blinkdelay();
+//                LED(3, 2);
+//                blinkdelay();
+//                LED(3, 2);
+//                blinkdelay();
+//                LED(3, 2);
+//                btn_start = (PIN(SW_START_PORT) & _BV(SW_START));
+//                if (old_start != btn_start) {
+//                    // start button changed
+//                    if (btn_start == 0) {
+//                        mode = 0;
+//                        RS232_puts_p(RESUME);
+//                    }
+//                    old_start = btn_start;
+//                }
+//
+//            }
+//            LEDS_OFF();
+//            LED(3, 1);
+//        }
+//    }
+//    return 0;
+//}

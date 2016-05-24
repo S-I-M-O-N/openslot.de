@@ -9,19 +9,19 @@
 #define COUNTDOWN_DELAY         10 // x/10 seconds
 
 // Hardware config
-#define LAP_COUNTER_PORT        PORTB
-#define LAP_COUNTER             PB2
-
-#define MODUL_PORT              PORTD
-#define MODUL_ST4               PD5
-#define MODUL_ST6               PD6
-
-#define RESPONSEWIRE_PORT       MODUL_PORT
-#define RESPONSEWIRE_PIN        MODUL_ST4
-
-#define I2C_PORT                PORTC
-#define I2C_SCL                 PC0
-#define I2C_SDA                 PC1
+//#define LAP_COUNTER_PORT        PORTB
+//#define LAP_COUNTER             PB2
+//
+//#define MODUL_PORT              PORTD
+//#define MODUL_ST4               PD5
+//#define MODUL_ST6               PD6
+//
+//#define RESPONSEWIRE_PORT       MODUL_PORT
+//#define RESPONSEWIRE_PIN        MODUL_ST4
+//
+//#define I2C_PORT                PORTC
+//#define I2C_SCL                 PC0
+//#define I2C_SDA                 PC1
 
 #define LED1_PORT               PORTA
 #define LED2_PORT               PORTA
@@ -44,22 +44,27 @@
 #define SPEAKER_PORT            PORTD
 #define SPEAKER                 PD7
 
-#define RAIL_POWER_PORT         PORTD
-#define RAIL_POWER              PD4 // high = rails powered
-#define RAIL_DETECT_PORT        PORTA
-#define RAIL_DETECT             PA7 // low = short circuit detection
+#define SLOT1_PORT				PORTD
+#define SLOT2_PORT				PORTD
+#define SLOT1					PD2
+#define SLOT2					PD3
 
-#define CONTROLLER_PORT         PORTB
-#define CONTROLLER_MAX          360 // full throttle ADC value
-#define CONTROLLER_DIVISOR      (uint8_t)(CONTROLLER_MAX/15)
-#define CONTROLLER1_SW          PB4
-#define CONTROLLER2_SW          PB5
-#define CONTROLLER3_SW          PB6
-#define CONTROLLER4_SW          PB7
-#define CONTROLLER1_SPEED       0 // ADC channel #
-#define CONTROLLER2_SPEED       1 // ADC channel #
-#define CONTROLLER3_SPEED       2 // ADC channel #
-#define CONTROLLER4_SPEED       3 // ADC channel #
+//#define RAIL_POWER_PORT         PORTD
+//#define RAIL_POWER              PD4 // high = rails powered
+//#define RAIL_DETECT_PORT        PORTA
+//#define RAIL_DETECT             PA7 // low = short circuit detection
+
+//#define CONTROLLER_PORT         PORTB
+//#define CONTROLLER_MAX          360 // full throttle ADC value
+//#define CONTROLLER_DIVISOR      (uint8_t)(CONTROLLER_MAX/15)
+//#define CONTROLLER1_SW          PB4
+//#define CONTROLLER2_SW          PB5
+//#define CONTROLLER3_SW          PB6
+//#define CONTROLLER4_SW          PB7
+//#define CONTROLLER1_SPEED       0 // ADC channel #
+//#define CONTROLLER2_SPEED       1 // ADC channel #
+//#define CONTROLLER3_SPEED       2 // ADC channel #
+//#define CONTROLLER4_SPEED       3 // ADC channel #
 
 // TIMING STUFF
 /*
@@ -72,16 +77,16 @@
 #define TIMER_7500NS     0xffff - (uint16_t)(VALUE_7500NS * F_CPU/TIMER1_DIVISOR)
 */
 //#define TIMER_7500NS     (uint16_t)(VALUE_7500NS * F_CPU/TIMER1_DIVISOR)
-#define TIMER0_DIVISOR  8
-#define VALUE0_250US    0.25e-3
-#define TIMER0_250US    0xff - (uint8_t)(VALUE0_250US * F_CPU/TIMER0_DIVISOR)
-#define TIMER0_2300NS   (uint8_t)(2300/250)
-
-#define TIMER2_DIVISOR  8
-#define VALUE2_50US     0.50e-4
-#define TIMER2_50US     (uint8_t)(VALUE2_50US * F_CPU/TIMER2_DIVISOR)
-#define VALUE2_250US    2.5e-4
-#define TIMER2_250US    (uint8_t)((VALUE2_250US * F_CPU/TIMER2_DIVISOR) - 2)
+//#define TIMER0_DIVISOR  8
+//#define VALUE0_250US    0.25e-3
+//#define TIMER0_250US    0xff - (uint8_t)(VALUE0_250US * F_CPU/TIMER0_DIVISOR)
+//#define TIMER0_2300NS   (uint8_t)(2300/250)
+//
+//#define TIMER2_DIVISOR  8
+//#define VALUE2_50US     0.50e-4
+//#define TIMER2_50US     (uint8_t)(VALUE2_50US * F_CPU/TIMER2_DIVISOR)
+//#define VALUE2_250US    2.5e-4
+//#define TIMER2_250US    (uint8_t)((VALUE2_250US * F_CPU/TIMER2_DIVISOR) - 2)
 
 #define TIMER1_DIVISOR  8
 #define VALUE1_7500NS   0.75e-2
@@ -94,7 +99,7 @@
 
 
 // constants
-#define MAX_SLOTS       6
+#define MAX_SLOTS       2
 
 // external variabled
 extern uint8_t mode;
