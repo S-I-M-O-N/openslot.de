@@ -3,7 +3,7 @@ The code is hosted at https://github.com/S-I-M-O-N/openslot.de
 The original OpenSlot.de code and hardware mod can be found at http://www.openslot.de
 
   Feature whishlist
-    1. start lights
+    1. start lights (with 0.2-3s random delay of start)
     2. analog lapcounter
     3. PWM based speed limit
     
