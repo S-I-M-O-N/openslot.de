@@ -7,11 +7,15 @@ The original OpenSlot.de code and hardware mod can be found at http://www.opensl
 
 In contrast to the original hardware mod the foto transistor has to be installed in the slot itself.
 With a IR led on the opposite side. When a slot car passes this position it will interupt the light beam and trigger the counter.
-\   ________    __________
-\          |   |          
-\   ===O ---------> O=====
-\    LED   |___|  foto transistor
-\           slot
+   \_______        \_________
+   
+          |   |
+          
+   ===O ---------> O=====
+   
+   LED   |___|  foto transistor
+   
+          slot
 
 I used a LED and foto transistor I had from another project:
 LED: 			SFH487-2
