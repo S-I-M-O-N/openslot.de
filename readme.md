@@ -15,7 +15,9 @@ With a IR led on the opposite side. When a slot car passes this position it will
           slot
 ```
 I used a LED and foto transistor I had from another project:
+
 LED: 			SFH487-2
+
 Foto transistor:	SFH309FA
 
 The foto transistor is connected to the blackbox in the original openslot.de project, but I found that it triggered more reliable after I removed C37, C39, R47 and R49.
