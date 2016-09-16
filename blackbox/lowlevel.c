@@ -1,11 +1,17 @@
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
 #include <util/delay.h>
+#include <stdbool.h>
 #include "stdint.h"
 #include "main.h"
 #include "driver/adc.h"
 #include "driver/rs232.h"
+#include "driver/i2clcd.h"
+#include "driver/i2cmaster.h"
 #include "lowlevel.h"
+
+extern uint8_t  btn_p = _BV(SW_PACECAR);
+extern uint8_t  old_p = _BV(SW_PACECAR);
 
 void blinkdelay(void) {
    _delay_ms(50);
@@ -65,12 +71,20 @@ void init_hardware(void) {
     initADC();
     SFIOR = 0;
 
+  	i2c_init();	// initialize i2c bus and lcd display
+  	lcd_init();
+  	lcd_command(LCD_DISPLAYON | LCD_CURSOROFF | LCD_BLINKINGOFF);
+	lcd_light(true);
+
     // set LED output
     DDR(LED1_PORT) |= _BV(LED1);
     DDR(LED2_PORT) |= _BV(LED2);
     DDR(LED3_PORT) |= _BV(LED3);
     DDR(LED4_PORT) |= _BV(LED4);
     DDR(LED5_PORT) |= _BV(LED5);
+
+    // set SPEAKER output
+    DDR(SPEAKER_PORT) |= _BV(SPEAKER);
 
     // set Controller Input Pull-UPs
 //    CONTROLLER_PORT |= (_BV(CONTROLLER1_SW) | _BV(CONTROLLER2_SW) | _BV(CONTROLLER3_SW) | _BV(CONTROLLER4_SW));
@@ -135,6 +149,7 @@ void init_hardware(void) {
 
 void panic_mode(void) {
 //    RAIL_POWER_PORT &= ~_BV(RAIL_POWER); // disable rails power
+	lcd_printlc_P(1, 1, PSTR("Panic mode          "));
     LEDS_OFF();
     LED(1, 2);
     blinkdelay();
@@ -149,6 +164,12 @@ void panic_mode(void) {
     blinkdelay();
     LED(4, 2);
     LED(5, 2);
+    btn_p = (PIN(SW_PACECAR_PORT) & _BV(SW_PACECAR));
+     if (old_p != btn_p) {
+         // pacecar button changed
+         if (btn_p == 0) pacecarbutton();
+         old_p = btn_p;
+     }
 }
 
 

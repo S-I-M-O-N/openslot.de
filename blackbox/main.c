@@ -2,6 +2,7 @@
 #include <avr/io.h>
 #include <avr/wdt.h>
 #include <avr/eeprom.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <avr/pgmspace.h>
@@ -9,6 +10,9 @@
 
 #include "driver/rs232.h"
 #include "driver/adc.h"
+
+#include "driver/i2clcd.h"
+#include "driver/i2cmaster.h"
 
 #include "main.h"
 #include "lowlevel.h"
@@ -48,8 +52,8 @@ typedef struct {
     unsigned unlimitedfuel:1; // 1bit bool
     unsigned trackchange:1; // 1bit bool
     uint16_t jumpstart_time, fuel;
-    uint8_t laps;
-    u32 lap_time_start, lap_time;
+    uint8_t laps, position;
+    u32 lap_time_start, lap_time, best_time;
 } cardata;
 
 static char s[8];
@@ -64,6 +68,8 @@ extern uint8_t  mode = 0;
 
 extern uint8_t  btn_start = _BV(SW_START);
 extern uint8_t  old_start = _BV(SW_START);
+extern uint8_t  btn_pacecar = _BV(SW_PACECAR);
+extern uint8_t  old_pacecar = _BV(SW_PACECAR);
 
 // todo: pack as bit structure:
 
@@ -71,6 +77,8 @@ typedef struct {
     unsigned fuel_enabled:1;
     unsigned pitlane_finishline:1;
     unsigned liveinfo:6;
+    unsigned lap_limit:1;
+    unsigned time_limit:1;
 } switches_s;
 switches_s switches;
 
@@ -107,6 +115,11 @@ volatile uint8_t timer0_delay;
 
 volatile uint16_t halfmilisecs = 0;
 volatile uint16_t decisecs = 0;
+
+volatile uint8_t lap_limit = 10;
+volatile uint32_t time_limit = 180000; // 180000 =  90 seconds = 90 * 2000 * 500ns
+
+volatile uint16_t beep = 0;
 
 
     /* RESPONSEWIRE frame format:
@@ -204,6 +217,19 @@ void startbutton(void) {
         LED(4, 1);
         LED(5, 1);
         RS232_puts_p(prepare);
+        lcd_printlc_P(1, 1, PSTR("Race prepare        "));
+        lcd_printlc_P(2, 1, PSTR("T P L   last  best S"));
+        lcd_printlc_P(3, 1, PSTR("1 0 0   0.00  0.00  "));
+        lcd_printlc_P(4, 1, PSTR("2 0 0   0.00  0.00  "));
+        if((PIN(SW_FUEL_PORT) & _BV(SW_FUEL)) == 1){
+        	switches.lap_limit = 0;
+        	switches.time_limit = 1;
+        }
+        else {
+        	switches.lap_limit = 1;
+        	switches.time_limit = 0;
+        }
+
     } else if (mode == 1) {
         // Initiate race countdown
         sysclk.value = 0;
@@ -216,7 +242,22 @@ void startbutton(void) {
         LED(4, 0);
         LED(5, 0);
         RS232_puts_p(countdownstart);
+        lcd_printlc_P(1, 1, PSTR("Race countdown      "));
     }
+}
+
+void pacecarbutton(void) {
+    // pacecar button press active -> we will use it to trigger panic mode
+     if (mode != 0xff) {
+                        mode = 0xff;
+                        RS232_puts_p(PANIC);
+                    }
+     else {
+                        mode = 0;
+                        LEDS_OFF();
+                        RS232_puts_p(RESUME);
+                        lcd_printlc_P(1, 1, PSTR("Resume              "));
+        }
 }
 
 ISR ( USART_RXC_vect ) {
@@ -310,6 +351,7 @@ ISR ( USART_RXC_vect ) {
                     } else {
                         mode = 0;
                         RS232_puts_p(RESUME);
+                        lcd_printlc_P(1, 1, PSTR("Resume              "));
                     }
                     break;
 
@@ -519,6 +561,8 @@ void reset_vars(void) {
 //        if (i<4) slot[i].unlimitedfuel = 0; else slot[i].unlimitedfuel = 1;
         slot[i].lap_time_start.value = 0;
         slot[i].lap_time.value = 0;
+        slot[i].best_time.value = 0;
+        slot[i].position = 0;
     }
     sysclk.value = 0;
 }
@@ -546,6 +590,7 @@ void countdown_progress(void) {
 //            LED(4, 0);
 //            LED(5, 0);
             mode = 3;
+            lcd_printlc_P(1, 1, PSTR("Race start          "));
             } break;
     }
 }
@@ -563,6 +608,27 @@ void lapinfo0(void) {
 	                    ultoa(sysclk.value, s, 16);
 	                    RS232_puts(s);
 	                    RS232_putc('\n');
+
+	                    lcd_gotolc(3,3);
+	                    itoa(slot[0].position, s, 10);  //Positon Slot 1
+	                    lcd_print(s);
+	                    lcd_gotolc(4,3);
+	                    itoa(slot[1].position, s, 10);  //Position Slot 2
+	                    lcd_print(s);
+
+	                    lcd_gotolc(3,5);
+	                    itoa(slot[0].laps, s, 10);
+	                    lcd_print(s);
+	                    lcd_gotolc(3,8);
+	                    dtostrf(slot[0].lap_time.value/2000.00, 5, 2, s);
+	                    lcd_print(s);
+	                    lcd_gotolc(3,13);
+	                    lcd_print(" ");
+	                    lcd_gotolc(3,14);
+	                    dtostrf(slot[0].best_time.value/2000.00, 5, 2, s);
+	                    lcd_print(s);
+	                    lcd_gotolc(3,19);
+	                    lcd_print("  ");
 }
 
 void lapinfo1(void) {
@@ -578,6 +644,27 @@ void lapinfo1(void) {
 	                    ultoa(sysclk.value, s, 16);
 	                    RS232_puts(s);
 	                    RS232_putc('\n');
+
+	                    lcd_gotolc(3,3);
+	                    itoa(slot[0].position, s, 10);  //Position Slot 1
+	                    lcd_print(s);
+	                    lcd_gotolc(4,3);
+	                    itoa(slot[1].position, s, 10);  //Position Slot 2
+	                    lcd_print(s);
+
+	                    lcd_gotolc(4,5);
+	                    itoa(slot[1].laps, s, 10);
+	                    lcd_print(s);
+	                    lcd_gotolc(4,8);
+	                    dtostrf(slot[1].lap_time.value/2000.00, 5, 2, s);
+	                    lcd_print(s);
+	                    lcd_gotolc(4,13);
+	                    lcd_print(" ");
+	                    lcd_gotolc(4,14);
+	                    dtostrf(slot[1].best_time.value/2000.00, 5, 2, s);
+	                    lcd_print(s);
+	                    lcd_gotolc(4,19);
+	                    lcd_print("  ");
 }
 
 void check_cars(void) {
@@ -685,10 +772,22 @@ int main(void)
     switches.fuel_enabled = 1;
     switches.pitlane_finishline = 0;
     switches.liveinfo = 0;
+    switches.lap_limit = 0;
+    switches.time_limit = 0;
 
     init_hardware();
     reset_vars();
     LED(3, 1); // enable middle led == idle mode
+    lcd_command(LCD_CLEAR);
+    _delay_ms(2);
+    lcd_printlc_P(1, 1, PSTR("Lapcounter ready    "));
+    lcd_printlc_P(3, 1, PSTR("Laplimit [laps]: "));
+    itoa(lap_limit, s, 10);
+    lcd_print(s);
+    lcd_printlc_P(4, 1, PSTR("Time limit [s]:"));
+    dtostrf(time_limit/2000.00, 3, 0, s);
+    lcd_print(s);
+
 
 
     // switch on rails power
@@ -697,9 +796,34 @@ int main(void)
     while (1) {
         // check for short circuit on the rails
 //        check_rails_shortcut();
-        check_cars();
+    	//lcd_gotolc(1,1);
+    //	dtostrf(sysclk.value/2000.00, 5, 2, s);
+   // 	lcd_print(s);
+        if (sysclk.value >= time_limit && switches.time_limit == 1) {
+        	if (slot[0].position == 1) {
+        		lcd_printlc_P(3, 20, PSTR("W"));
+        	}
+        	else {
+        		lcd_printlc_P(4, 20, PSTR("W"));
+        	}
+        	switches.time_limit = 0;
+        	mode = 0xff;
+        }
+    	check_cars();
         while (mode == 0xff) panic_mode();
 
+        if (mode == 0){
+
+
+        	if (slot[0].position == 1) {
+        		LED(1, 1);
+        		LED(5, 0);
+        	}
+        	if (slot[1].position == 1) {
+        		LED(5, 1);
+        		LED(1, 0);
+        	}
+        }
         if (response_len > 0) {
             itoa(response, s, 2);
             response_len = 0;
@@ -716,6 +840,13 @@ int main(void)
             if (btn_start == 0) startbutton();
             old_start = btn_start;
         }
+
+        btn_pacecar = (PIN(SW_PACECAR_PORT) & _BV(SW_PACECAR));
+         if (old_pacecar != btn_pacecar) {
+             // pacecar button changed
+             if (btn_pacecar == 0) pacecarbutton();
+             old_pacecar = btn_pacecar;
+         }
 
         if (mode==3) {
             // RACE START!
@@ -740,13 +871,13 @@ int main(void)
         if (car0 == 1) {
         	lapinfo0();
         	car0 = 0;
-        	LED(1, 2);
+        	//LED(1, 2);
         }
 
         if (car1 == 1) {
         	lapinfo1();
         	car1 = 0;
-        	LED(2, 2);
+        	//LED(2, 2);
         }
 
 //        switch (packet_index) {

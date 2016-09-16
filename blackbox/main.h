@@ -4,7 +4,9 @@
 #include <avr/wdt.h>
 #include <stdint.h>
 
-#define VERSION "1.8"
+#define VERSION "1.9"
+
+#define F_CPU 8000000UL       // CPU clock in Hz
 
 #define COUNTDOWN_DELAY         10 // x/10 seconds
 

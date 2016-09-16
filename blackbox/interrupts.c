@@ -20,6 +20,10 @@ ISR ( TIMER1_COMPA_vect ) {
     		halfmilisecs = 0;
     	}
     }
+    if (beep > 0) {
+    	SPEAKER_PORT ^= _BV(SPEAKER);
+    	beep--;
+    }
     sysclk.value++; // increment 500ns timer
 }
 
@@ -145,13 +149,29 @@ ISR (INT0_vect) {
   	          itoa(slot[0].jumpstart_time, s, 16);
   	          RS232_puts(s);
   	          RS232_putc('\n');
+  	  		  lcd_printlc_P(3, 20, PSTR("J"));
   	  	  }
   	  	  else {
   	  		  car0 = 1;
-  	  		  LED(1, 2);
+  	  		  //LED(1, 2);
   	  		  if (slot[0].lap_time_start.value != 0) {
   	  			  slot[0].lap_time.value = sysclk.value - slot[0].lap_time_start.value;
   	  			  slot[0].laps++;
+  	  			  if (slot[0].laps > slot[1].laps) {
+  	  			      slot[0].position = 1;
+  	  			      slot[1].position = 2;
+  	  			  }
+  	  			  if (slot[0].best_time.value == 0 || slot[0].lap_time.value < slot[0].best_time.value) {
+  	  			      slot[0].best_time.value = slot[0].lap_time.value;
+  	  			      beep = 1000;
+  	  			  }
+  	  			  if (slot[0].laps >= lap_limit && switches.lap_limit == 1) {
+  	  				  lcd_gotolc(3,5);
+  	  				  itoa(slot[0].laps, s, 10);
+  	  			      lcd_print(s);
+  	  				  lcd_printlc_P(3, 20, PSTR("W"));
+  	  				  mode = 0xFF;
+  	  			  }
   	  		  }
   	  		  slot[0].lap_time_start.value = sysclk.value;
   	  	  }
@@ -184,13 +204,29 @@ ISR (INT1_vect) {
   	  		  itoa(slot[1].jumpstart_time, s, 16);
   	  		  RS232_puts(s);
   	  		  RS232_putc('\n');
+  	  		  lcd_printlc_P(4, 20, PSTR("J"));
   	  	  }
   	  	  else {
   	  		  car1 = 1;
-  	  		  LED(2, 2);
+  	  		//  LED(2, 2);
   	  		  if (slot[1].lap_time_start.value != 0) {
   	  			  slot[1].lap_time.value = sysclk.value - slot[1].lap_time_start.value;
   	  			  slot[1].laps++;
+  	  			  if (slot[1].laps > slot[0].laps) {
+  	  			      slot[1].position = 1;
+  	  			      slot[0].position = 2;
+  	  			  }
+  	  			  if (slot[1].best_time.value == 0 || slot[1].lap_time.value < slot[1].best_time.value) {
+  	  			      slot[1].best_time.value = slot[1].lap_time.value;
+  	  			      beep = 1000;
+  	  			  }
+  	  			  if (slot[1].laps >= lap_limit && switches.lap_limit == 1) {
+  	  				  lcd_gotolc(4,5);
+  	  				  itoa(slot[1].laps, s, 10);
+  	  			      lcd_print(s);
+  	  				  lcd_printlc_P(4, 20, PSTR("W"));
+  	  				  mode = 0xFF;
+  	  			  }
   	  		  }
   	  		  slot[1].lap_time_start.value = sysclk.value;
   	  	  }
